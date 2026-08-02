@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ErrorBoundary } from './components/layout/ErrorBoundary'
@@ -19,6 +20,53 @@ import { SettingsPage } from './pages/SettingsPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { HelpPage } from './pages/HelpPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+
+function PageTitleManager() {
+  const location = useLocation()
+
+  useEffect(() => {
+    const path = location.pathname
+    let title: string
+
+    if (path === '/' || path === '/landing') {
+      title = 'TaskFlow — Next-Gen Productivity Workspace'
+    } else if (path === '/dashboard') {
+      title = 'Dashboard — TaskFlow'
+    } else if (path === '/tasks') {
+      title = 'All Tasks — TaskFlow'
+    } else if (path === '/daily') {
+      title = 'Daily Tasks — TaskFlow'
+    } else if (path === '/weekly') {
+      title = 'Weekly Goals — TaskFlow'
+    } else if (path === '/monthly') {
+      title = 'Monthly Targets — TaskFlow'
+    } else if (path === '/analytics') {
+      title = 'Analytics & Insights — TaskFlow'
+    } else if (path === '/notifications') {
+      title = 'Notifications — TaskFlow'
+    } else if (path === '/settings') {
+      title = 'Settings & Preferences — TaskFlow'
+    } else if (path === '/profile') {
+      title = 'User Profile — TaskFlow'
+    } else if (path === '/help') {
+      title = 'Help & Support — TaskFlow'
+    } else if (path === '/auth/sign-in') {
+      title = 'Sign In — TaskFlow'
+    } else if (path === '/auth/sign-up') {
+      title = 'Create Account — TaskFlow'
+    } else if (path === '/auth/forgot-password') {
+      title = 'Reset Password Request — TaskFlow'
+    } else if (path === '/auth/reset-password') {
+      title = 'Set New Password — TaskFlow'
+    } else {
+      title = '404 Page Not Found — TaskFlow'
+    }
+
+    document.title = title
+  }, [location.pathname])
+
+  return null
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -107,6 +155,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <BrowserRouter>
+            <PageTitleManager />
             <Routes>
               {/* Public Landing & Home */}
               <Route path="/" element={<LandingPage />} />
