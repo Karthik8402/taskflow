@@ -71,7 +71,7 @@ export function SignInPage() {
                 label="Email Address"
                 type="email"
                 required
-                autoComplete="current-password"
+                autoComplete="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}

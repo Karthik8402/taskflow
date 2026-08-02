@@ -29,6 +29,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     monthly: todos.filter(t => t.category === 'monthly').length,
   }
 
+  const overdueCount = todos.filter(t => {
+    if (t.completed || !t.due_date) return false
+    const dueStr = new Date(t.due_date).toISOString().split('T')[0]
+    const todayStr = new Date().toISOString().split('T')[0]
+    return dueStr < todayStr
+  }).length
+
   const primaryItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, count: counts.total },
     { label: 'Daily Tasks', path: '/daily', icon: Clock, count: counts.daily },
@@ -39,7 +46,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const secondaryItems = [
     { label: 'Landing Page', path: '/landing', icon: Sparkles },
-    { label: 'Notifications', path: '/notifications', icon: Bell },
+    { label: 'Notifications', path: '/notifications', icon: Bell, count: overdueCount > 0 ? overdueCount : undefined },
     { label: 'Settings & Data', path: '/settings', icon: Settings },
     { label: 'Help & Docs', path: '/help', icon: HelpCircle },
   ]
@@ -125,14 +132,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               key={item.path}
               to={item.path}
               onClick={() => isOpen && onClose()}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
+              className={`flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
                 active
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
               }`}
             >
-              <Icon size={16} className={active ? 'text-white' : 'text-slate-400 dark:text-slate-500'} />
-              <span>{item.label}</span>
+              <div className="flex items-center gap-2.5">
+                <Icon size={16} className={active ? 'text-white' : 'text-slate-400 dark:text-slate-500'} />
+                <span>{item.label}</span>
+              </div>
+              {typeof item.count === 'number' && (
+                <span
+                  className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                    active
+                      ? 'bg-white/20 text-white'
+                      : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {item.count}
+                </span>
+              )}
             </Link>
           )
         })}
