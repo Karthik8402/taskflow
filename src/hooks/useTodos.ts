@@ -111,7 +111,10 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
     setError(null)
 
     if (isGuest || !isSupabaseConfigured || !user) {
-      const guestTodos = getGuestTodos()
+      let guestTodos = getGuestTodos()
+      if (categoryFilter && categoryFilter !== 'all') {
+        guestTodos = guestTodos.filter(t => t.category === categoryFilter)
+      }
       setTodos(guestTodos)
       setLoading(false)
       return
