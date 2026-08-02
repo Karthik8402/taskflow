@@ -164,7 +164,7 @@ jobs:
       # as static assets — no Node.js SSR server, no RSC, no server actions.
       # Tracked in: https://github.com/Karthik8402/taskflow/issues
       - name: Audit high and critical vulnerabilities
-        run: npm audit --audit-level=high || true
+        run: npm audit --audit-level=critical
 
       - name: Full audit summary (informational)
         if: always()

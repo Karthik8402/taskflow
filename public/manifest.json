@@ -1,0 +1,18 @@
+{
+  "short_name": "TaskFlow",
+  "name": "TaskFlow — 24/7 To-Do & Task Manager",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512 192x192 64x64 32x32 24x24 16x16",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0B0F17",
+  "theme_color": "#2563EB",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "A modern, secure, 24/7 productivity & task management application with real-time sync and drag-and-drop workflow."
+}
