@@ -434,7 +434,7 @@ export function LandingPage() {
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
               <CheckCircle2 size={16} />
             </div>
-            <span className="font-bold text-sm">TaskFlow SaaS</span>
+            <span className="font-bold text-sm">TaskFlow</span>
           </div>
 
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
