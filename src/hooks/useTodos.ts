@@ -144,26 +144,35 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
     fetchTodos()
 
     if (!isGuest && isSupabaseConfigured && user) {
-      const channelId = `todos-channel-${categoryFilter || 'all'}-${Date.now()}`
-      const channel = supabase
-        .channel(channelId)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'todos',
-            filter: categoryFilter && categoryFilter !== 'all' ? `category=eq.${categoryFilter}` : undefined,
-          },
-          () => {
-            fetchTodos()
-          }
-        )
+      const subId = Math.random().toString(36).substring(2, 8)
+      const channelId = `realtime-todos-${categoryFilter || 'all'}-${subId}`
+      let channel: ReturnType<typeof supabase.channel> | null = null
 
-      channel.subscribe()
+      try {
+        channel = supabase
+          .channel(channelId)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'todos',
+              filter: categoryFilter && categoryFilter !== 'all' ? `category=eq.${categoryFilter}` : undefined,
+            },
+            () => {
+              fetchTodos()
+            }
+          )
+
+        channel.subscribe()
+      } catch (err) {
+        console.warn('Supabase Realtime subscription notice:', err)
+      }
 
       return () => {
-        supabase.removeChannel(channel)
+        if (channel) {
+          supabase.removeChannel(channel)
+        }
       }
     }
   }, [fetchTodos, categoryFilter, isGuest, user])
