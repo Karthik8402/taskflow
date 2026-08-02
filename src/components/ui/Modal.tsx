@@ -62,10 +62,10 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
         aria-describedby={description ? 'modal-description' : undefined}
-        className={`relative w-full ${widths[maxWidth]} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-150`}
+        className={`relative w-full ${widths[maxWidth]} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-50 animate-in zoom-in-95 duration-150`}
       >
         {(title || description) && (
-          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4 rounded-t-xl">
             <div>
               {title && (
                 <h2 id="modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
@@ -90,7 +90,7 @@ export function Modal({
           </div>
         )}
 
-        <div className="p-6">{children}</div>
+        <div className="p-6 rounded-b-xl">{children}</div>
       </div>
     </div>
   )

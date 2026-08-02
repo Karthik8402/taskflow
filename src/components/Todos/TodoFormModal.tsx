@@ -4,9 +4,10 @@ import { validateTaskInput, TASK_CONSTRAINTS } from '../../lib/validation'
 import { Modal } from '../ui/Modal'
 import { Input } from '../ui/Input'
 import { Textarea } from '../ui/Textarea'
-import { Select } from '../ui/Select'
 import { Button } from '../ui/Button'
 import { Alert } from '../ui/Alert'
+import { DatePicker } from '../ui/DatePicker'
+import { PrioritySelect } from '../ui/PrioritySelect'
 import { Clock, Calendar, Sparkles } from 'lucide-react'
 
 interface TodoFormModalProps {
@@ -155,22 +156,19 @@ export function TodoFormModal({
         </div>
 
         {/* Priority Select */}
-        <Select
+        <PrioritySelect
           label="Priority Level"
           value={priority}
-          onChange={e => setPriority(e.target.value as TodoPriority)}
-        >
-          <option value="low">Low Priority</option>
-          <option value="medium">Medium Priority</option>
-          <option value="high">High Priority</option>
-        </Select>
+          onChange={val => setPriority(val)}
+        />
 
         {/* Due Date */}
-        <Input
+        <DatePicker
           label="Due Date (Optional)"
-          type="date"
           value={dueDate}
-          onChange={e => setDueDate(e.target.value)}
+          onChange={val => setDueDate(val)}
+          placeholder="Pick a due date"
+          placement="top"
         />
 
         {/* Modal Buttons */}

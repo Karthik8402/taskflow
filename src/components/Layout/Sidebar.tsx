@@ -30,7 +30,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }
 
   const primaryItems = [
-    { label: 'Dashboard', path: '/', icon: LayoutDashboard, count: counts.total },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, count: counts.total },
     { label: 'Daily Tasks', path: '/daily', icon: Clock, count: counts.daily },
     { label: 'Weekly Goals', path: '/weekly', icon: Calendar, count: counts.weekly },
     { label: 'Monthly Targets', path: '/monthly', icon: Sparkles, count: counts.monthly },
@@ -38,14 +38,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const secondaryItems = [
+    { label: 'Landing Page', path: '/landing', icon: Sparkles },
     { label: 'Notifications', path: '/notifications', icon: Bell },
     { label: 'Settings & Data', path: '/settings', icon: Settings },
     { label: 'Help & Docs', path: '/help', icon: HelpCircle },
   ]
 
   const isActive = (path: string) => {
-    if (path === '/' && location.pathname === '/') return true
-    if (path !== '/' && location.pathname.startsWith(path)) return true
+    if (location.pathname === path) return true
+    if (path !== '/' && path !== '/dashboard' && location.pathname.startsWith(path)) return true
     return false
   }
 

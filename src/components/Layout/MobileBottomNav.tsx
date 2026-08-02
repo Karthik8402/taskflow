@@ -5,7 +5,7 @@ export function MobileBottomNav() {
   const location = useLocation()
 
   const navItems = [
-    { label: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Daily', path: '/daily', icon: Clock },
     { label: 'Weekly', path: '/weekly', icon: Calendar },
     { label: 'Monthly', path: '/monthly', icon: Sparkles },
@@ -13,8 +13,8 @@ export function MobileBottomNav() {
   ]
 
   const isActive = (path: string) => {
-    if (path === '/' && location.pathname === '/') return true
-    if (path !== '/' && location.pathname.startsWith(path)) return true
+    if (location.pathname === path) return true
+    if (path !== '/' && path !== '/dashboard' && location.pathname.startsWith(path)) return true
     return false
   }
 

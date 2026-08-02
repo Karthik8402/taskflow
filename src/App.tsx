@@ -5,6 +5,7 @@ import { ErrorBoundary } from './components/layout/ErrorBoundary'
 import { AppShell } from './components/layout/AppShell'
 import { Spinner } from './components/ui/Spinner'
 
+import { LandingPage } from './pages/LandingPage'
 import { SignInPage } from './pages/auth/SignInPage'
 import { SignUpPage } from './pages/auth/SignUpPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
@@ -42,116 +43,61 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-function AuthenticatedApp() {
+function AuthenticatedWorkspace() {
   return (
-    <AppShell>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/tasks"
-          element={
-            <ProtectedRoute>
+    <ProtectedRoute>
+      <AppShell>
+        <Routes>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route
+            path="tasks"
+            element={
               <TaskListPage
                 category="all"
                 title="All Tasks"
                 description="Manage and filter your entire task portfolio across categories."
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/daily"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="daily"
+            element={
               <TaskListPage
                 category="daily"
                 title="Daily Tasks"
                 description="Focus on high-impact actions and daily habit execution."
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/weekly"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="weekly"
+            element={
               <TaskListPage
                 category="weekly"
                 title="Weekly Goals"
                 description="Medium-term milestone objectives for the current week."
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/monthly"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="monthly"
+            element={
               <TaskListPage
                 category="monthly"
                 title="Monthly Targets"
                 description="Strategic long-term targets for the current month."
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <AnalyticsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute>
-              <NotificationsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/help"
-          element={
-            <ProtectedRoute>
-              <HelpPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <ProtectedRoute>
-              <NotFoundPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </AppShell>
+            }
+          />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="help" element={<HelpPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AppShell>
+    </ProtectedRoute>
   )
 }
 
@@ -162,15 +108,19 @@ export default function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* Auth Routes */}
+              {/* Public Landing & Home */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/landing" element={<LandingPage />} />
+
+              {/* Authentication Routes */}
               <Route path="/auth" element={<Navigate to="/auth/sign-in" replace />} />
               <Route path="/auth/sign-in" element={<SignInPage />} />
               <Route path="/auth/sign-up" element={<SignUpPage />} />
               <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Main Authenticated Layout Routes */}
-              <Route path="/*" element={<AuthenticatedApp />} />
+              {/* Main Authenticated SaaS Workspace App Routes */}
+              <Route path="/*" element={<AuthenticatedWorkspace />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>
