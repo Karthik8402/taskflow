@@ -4,10 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   test: {
-    // Use vmThreads instead of forks to avoid the undici/CacheStorage
-    // incompatibility with some Node.js minor versions in CI.
-    pool: 'vmThreads',
-    environment: 'jsdom',
+    environment: 'happy-dom',
     globals: true,
     setupFiles: './src/test/setup.ts',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
