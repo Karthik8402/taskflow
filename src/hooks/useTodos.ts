@@ -144,8 +144,9 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
     fetchTodos()
 
     if (!isGuest && isSupabaseConfigured && user) {
+      const channelId = `todos-channel-${categoryFilter || 'all'}-${Date.now()}`
       const channel = supabase
-        .channel(`public:todos:${categoryFilter || 'all'}`)
+        .channel(channelId)
         .on(
           'postgres_changes',
           {
@@ -158,7 +159,8 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
             fetchTodos()
           }
         )
-        .subscribe()
+
+      channel.subscribe()
 
       return () => {
         supabase.removeChannel(channel)
