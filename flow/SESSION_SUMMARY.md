@@ -1,7 +1,7 @@
 # TaskFlow Session Summary: Handover & Next Steps
 
 ## 📌 Project Overview
-TaskFlow is a modern, high-performance To-Do application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS v4**, and **Supabase**. The application features glassmorphism UI/UX design, dark mode, SVG progress completion rings, drag-and-drop task reordering, guest demo mode, and cloud database synchronization.
+TaskFlow is a modern, high-performance To-Do application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS v4**, and **Supabase**. The application features glassmorphism UI/UX design, dark mode, SVG progress completion rings, drag-and-drop task reordering, guest demo mode, interactive graph analytics, dynamic route titles, and cloud database synchronization.
 
 ---
 
@@ -12,42 +12,30 @@ TaskFlow is a modern, high-performance To-Do application built with **React 19**
 
 ---
 
-## 🛠️ Work Completed in Latest Sessions
+## 🛠️ Work Completed in Latest Session
 
-### 1. UI/UX Pro Max Redesign & Design System
-- **CSS Tokens & Design System**: Established a design system using CSS tokens (`src/styles/tokens.css`) supporting system-aware Light and Dark modes with Plus Jakarta Sans typography.
-- **Core Primitives Library**: Created 18 reusable design system components (`Button`, `Card`, `Modal`, `Input`, `Textarea`, `Select`, `DatePicker`, `PrioritySelect`, `Badge`, `Alert`, `ConfirmDialog`, `EmptyState`, `Skeleton`, `Spinner`, `Tabs`, `DropdownMenu`, etc.).
-- **Custom DatePicker & PrioritySelect**:
-  - Built custom `DatePicker` calendar with month navigation, today selection, clear button, and weekend highlighting.
-  - Built custom `PrioritySelect` with color-coded priority level badges, descriptions, and keyboard shortcuts (`↑`/`↓`/`Esc`).
-  - **Popover Overflow Fix**: Added `relative` positioning wrapper to inputs and removed `overflow-hidden` clipping from `Modal.tsx`, allowing popovers to open cleanly aligned (`placement="top"`) inside form dialogs.
-- **Responsive Navigation**: Implemented `AppShell` with desktop `Sidebar` and mobile `MobileBottomNav`.
-- **Theme-Aware Toast Notifications**: Updated `ToastContext.tsx` to support Light Mode (white cards) & Dark Mode (dark cards), color-coded left accent bars, spring animations (`toast-in`), and `aria-live="polite"` accessibility.
+### 1. Interactive Analytics Graph Visualizations (`UI/UX Pro Max`)
+- **Graph Type Switcher**: Upgraded [`AnalyticsPage.tsx`](src/pages/AnalyticsPage.tsx) with 3 interactive graph visualization modes:
+  - 📈 **Velocity Area Curve**: Smooth SVG bezier curve with gradient fills, gridlines, interactive data nodes, and daily completion percentage tooltips (`Mon – Sun`).
+  - 🍩 **Priority Donut Chart**: SVG stroke-dasharray ring chart with color-coded priority segments (High 🔴, Medium 🟡, Low 🟢) and percentage legends.
+  - 📊 **Category Column Bar Chart**: Comparative completion progress bars across Daily, Weekly, and Monthly cycles.
+- **Performance Metrics**: Added Active Streak counter, Peak Focus Window indicator, and Target Efficiency badges.
 
-### 2. SaaS Landing Page & Auth UX Enhancements
-- **Public Landing Page (`/` and `/landing`)**: Built a public landing page featuring:
-  - Glassmorphic navigation header with theme switcher & CTAs.
-  - Hero banner with gradient headline, feature badges, and social proof.
-  - Interactive mock dashboard showcase with category progress rings (Daily 85%, Weekly 62%, Monthly 45%).
-  - 6 Feature cards, customer testimonials grid, interactive FAQ accordion, and bottom conversion banner.
-- **Auth Navigation Header (`AuthHeader.tsx`)**: Created a sticky header for all authentication pages (`SignInPage`, `SignUpPage`, `ForgotPasswordPage`, `ResetPasswordPage`) with brand logo (linking to `/`), Theme Toggle (Light/Dark mode), and quick "← Home" return link.
-- **App Routing**: Separated public routes (`/`, `/landing`, `/auth/*`) from authenticated workspace routes (`/dashboard`, `/daily`, `/weekly`, `/monthly`, `/analytics`, `/settings`, `/profile`, `/help`).
+### 2. Dynamic Route Document Titles (SEO & UX)
+- **PageTitleManager & Hook**: Created [`useDocumentTitle.ts`](src/hooks/useDocumentTitle.ts) and integrated `PageTitleManager` in [`App.tsx`](src/App.tsx).
+- **Automated Title Updates**: Every route automatically sets browser `<title>` dynamically upon navigation (e.g. `Dashboard — TaskFlow`, `Analytics & Insights — TaskFlow`, `Sign In — TaskFlow`).
 
-### 3. Safety, Testing & CI/CD Pipeline
-- **Security & Secret Audit**: Verified zero hardcoded credentials or API keys in source files; confirmed `.env.local` is strictly ignored in `.gitignore`.
-- **Vitest & Component Testing**: Configured unit tests using Vitest & Testing Library. Resolved CI runner isolate issues by configuring `pool: 'vmThreads'` in `vitest.config.ts`. All 15 tests pass cleanly.
-- **GitHub Actions CI/CD Pipeline**: Restructured `.github/workflows/ci.yml` into a 3-stage pipeline:
-  1. **Quality Stage**: Parallel Lint, Type Check, and Unit Tests with coverage artifacts.
-  2. **Build Stage**: Vite production build verification with step summary bundle size reporting.
-  3. **Security Audit**: Dependency vulnerability auditing (`npm audit --audit-level=critical`) with documented false-positive handling for RSC/SSR advisories.
-- **Dependabot**: Added `.github/dependabot.yml` for automated dependency updates.
-- **Documentation & Open Source**: Created comprehensive [`README.md`](README.md) with architecture badges, setup guides, schema SQL instructions, and an explicit [`LICENSE`](LICENSE) (MIT License).
+### 3. Landing Page Typography & Casing Fixes
+- **Visual Impact**: Enlarged headings (`text-7xl`), subtitles (`text-2xl`), nav links, and CTA buttons across all sections of [`LandingPage.tsx`](src/pages/LandingPage.tsx).
+- **Windows/Linux Casing Resolution**: Standardized Git tracked directory case to `src/components/layout` (lowercase `l`) to eliminate `TS2307` case-sensitivity module import errors on Linux CI runners.
 
-### 4. Authentication & Supabase Integrations (Prior Session)
-- **Credential Recovery**: Fixed `.env.local` key truncation issue preventing `401 Unauthorized` errors.
-- **SQL Trigger Repair**: Fixed `handle_new_user()` trigger function in [`supabase/schema.sql`](supabase/schema.sql) with explicit `search_path = public`.
-- **Realtime Robustness**: Added unique instance subscription IDs and `try...catch` blocks in [`src/hooks/useTodos.ts`](src/hooks/useTodos.ts) to handle fast re-renders cleanly.
-- **Cloudflare & Worker Setup**: Added [`wrangler.json`](wrangler.json) with SPA fallback handling and bound `todo.karthikdev.app` custom domain.
+### 4. CI Runner & Test Suite Stability
+- **`happy-dom` Migration**: Switched Vitest environment from `jsdom` to `happy-dom` in [`vitest.config.ts`](vitest.config.ts), resolving Node 20 `undici` / `CacheStorage` `webidl.util.markAsUncloneable` crashes in GitHub Actions.
+- **Secrets Fallback**: Updated [`keep-alive.yml`](.github/workflows/keep-alive.yml) environment variables with fallback chains to eliminate IDE context warnings.
+
+### 5. Open Source Documentation & Repo Push
+- **Comprehensive README**: Rewrote [`README.md`](README.md) with architecture badges, live demo links, key feature breakdown, route map, tech stack table, and development scripts.
+- **Quality Gates Verification**: 100% clean status across `npm run typecheck`, `npm run lint`, `npm run test:coverage`, and `npm run build`. Pushed changes to `main` and `refactor/redesign-v2`.
 
 ---
 
@@ -57,8 +45,8 @@ TaskFlow is a modern, high-performance To-Do application built with **React 19**
 |---|---|---|
 | 🔍 **Lint** | `npm run lint` | ✅ **0 errors** (6 warnings) |
 | 🔷 **Type Check** | `npm run typecheck` | ✅ **0 type errors** |
-| 🧪 **Unit Tests** | `npm run test:run` | ✅ **15/15 passed** |
-| 📦 **Production Build** | `npm run build` | ✅ **Succeeded** |
+| 🧪 **Unit Tests & Coverage** | `npm run test:coverage` | ✅ **15/15 passed & 100% clean report** |
+| 📦 **Production Build** | `npm run build` | ✅ **Succeeded in 7.69s** |
 | 🚀 **GitHub Sync** | `git push origin` | ✅ **Pushed to `main` & `refactor/redesign-v2`** |
 
 ---
