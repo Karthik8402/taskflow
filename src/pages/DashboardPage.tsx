@@ -1,26 +1,28 @@
 import { useState } from 'react'
 import { useTodos } from '../hooks/useTodos'
-import { DemoBanner } from '../components/Layout/DemoBanner'
-import { StatsCard } from '../components/Dashboard/StatsCard'
+import { useToast } from '../context/ToastContext'
+import { PageHeader } from '../components/ui/PageHeader'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
 import { ProgressRing } from '../components/Dashboard/ProgressRing'
 import { TodoList } from '../components/Todos/TodoList'
 import { TodoFilter } from '../components/Todos/TodoFilter'
 import { TodoFormModal } from '../components/Todos/TodoFormModal'
-import type { Todo, TodoPriority, StatusFilter } from '../types'
+import { TaskListSkeleton } from '../components/ui/Skeleton'
+import type { Todo, TodoCategory, TodoPriority, StatusFilter } from '../types'
 import {
   ListTodo,
-  CheckCircle,
+  CheckCircle2,
   Clock,
   AlertTriangle,
   Plus,
   TrendingUp,
-  Calendar,
-  Sparkles,
 } from 'lucide-react'
 
 export function DashboardPage() {
   const { todos, loading, addTodo, toggleTodo, updateTodo, deleteTodo, reorderTodos } =
     useTodos('all')
+  const { success, error } = useToast()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [priorityFilter, setPriorityFilter] = useState<TodoPriority | 'all'>('all')
@@ -28,7 +30,7 @@ export function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
 
-  // Compute Stats
+  // Compute Statistics
   const total = todos.length
   const completed = todos.filter(t => t.completed).length
   const pending = total - completed
@@ -52,7 +54,7 @@ export function DashboardPage() {
   const filteredTodos = todos.filter(t => {
     const matchesSearch =
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (t.description || '').toLowerCase().includes(searchQuery.toLowerCase())
 
     const matchesPriority = priorityFilter === 'all' || t.priority === priorityFilter
 
@@ -64,17 +66,42 @@ export function DashboardPage() {
     return matchesSearch && matchesPriority && matchesStatus
   })
 
-  const handleCreateTask = async (data: {
+  const handleCreateOrUpdateTask = async (data: {
     title: string
     description: string
-    category: any
-    priority: any
+    category: TodoCategory
+    priority: TodoPriority
     due_date: string | null
   }) => {
-    if (editingTodo) {
-      await updateTodo(editingTodo.id, data)
-    } else {
-      await addTodo(data)
+    try {
+      if (editingTodo) {
+        await updateTodo(editingTodo.id, data)
+        success('Task updated successfully.')
+      } else {
+        await addTodo(data)
+        success('New task created.')
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save task'
+      error(msg)
+    }
+  }
+
+  const handleToggle = async (id: string, completed: boolean) => {
+    try {
+      await toggleTodo(id, completed)
+      success(completed ? 'Task completed!' : 'Task marked pending.')
+    } catch {
+      error('Failed to update task status.')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteTodo(id)
+      success('Task deleted.')
+    } catch {
+      error('Failed to delete task.')
     }
   }
 
@@ -90,114 +117,141 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Demo Warning Banner */}
-      <DemoBanner />
+      <PageHeader
+        title="Productivity Dashboard"
+        description="Real-time monitoring of daily, weekly, and monthly task execution."
+        action={
+          <Button variant="primary" size="sm" onClick={handleOpenNewModal}>
+            <Plus size={16} />
+            <span>New Task</span>
+          </Button>
+        }
+      />
 
-      {/* Top Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>Productivity Dashboard</span>
-            <span className="p-1.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">
-              Overview
-            </span>
-          </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Real-time monitoring of daily, weekly, and monthly tasks.
-          </p>
-        </div>
-
-        <button
-          onClick={handleOpenNewModal}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/25 transition-all cursor-pointer"
-        >
-          <Plus size={16} />
-          <span>New Task</span>
-        </button>
-      </div>
-
-      {/* Metric Cards Row */}
+      {/* Top Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="Total Tasks"
-          value={total}
-          subtitle="All active & completed"
-          icon={ListTodo}
-          colorClass="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-          trend={`${total} total entries recorded`}
-        />
-        <StatsCard
-          title="Completed"
-          value={completed}
-          subtitle={`${Math.round(completionPercentage)}% completed`}
-          icon={CheckCircle}
-          colorClass="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          trend={`${completed} tasks finished`}
-        />
-        <StatsCard
-          title="Pending Focus"
-          value={pending}
-          subtitle="In progress"
-          icon={Clock}
-          colorClass="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
-          trend={`${pending} items remaining`}
-        />
-        <StatsCard
-          title="High Priority"
-          value={highPriorityCount}
-          subtitle="Needs attention"
-          icon={AlertTriangle}
-          colorClass="bg-rose-500/10 text-rose-600 dark:text-rose-400"
-          trend={highPriorityCount > 0 ? 'Urgent items pending' : 'No urgent alerts'}
-        />
+        <Card>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Total Tasks
+              </p>
+              <p className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+                {total}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Recorded tasks</p>
+            </div>
+            <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md">
+              <ListTodo size={22} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Completed
+              </p>
+              <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                {completed}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {Math.round(completionPercentage)}% complete
+              </p>
+            </div>
+            <div className="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">
+              <CheckCircle2 size={22} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Pending Focus
+              </p>
+              <p className="text-2xl font-extrabold text-amber-600 dark:text-amber-400">
+                {pending}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Items in progress</p>
+            </div>
+            <div className="p-3 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-md">
+              <Clock size={22} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                High Priority
+              </p>
+              <p className="text-2xl font-extrabold text-red-600 dark:text-red-400">
+                {highPriorityCount}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Urgent items</p>
+            </div>
+            <div className="p-3 bg-red-500/10 text-red-600 dark:text-red-400 rounded-md">
+              <AlertTriangle size={22} />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Progress Rings Visual Overview */}
-      <div className="glass-card p-6 rounded-3xl space-y-4 border border-gray-200/80 dark:border-gray-800">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <TrendingUp size={16} className="text-indigo-500" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-blue-600 dark:text-blue-400" />
             <span>Category Progress Metrics</span>
-          </h2>
-        </div>
+          </CardTitle>
+          <CardDescription>Visual completion rate across time horizons</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="flex flex-col items-center p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800">
+              <ProgressRing
+                percentage={dailyPct}
+                size={110}
+                strokeWidth={9}
+                gradientId="dailyGradient"
+                label="Daily"
+                subtitle={`${dailyCompleted} of ${dailyTodos.length}`}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
-            <ProgressRing
-              percentage={dailyPct}
-              size={120}
-              strokeWidth={10}
-              label="Daily"
-              subtitle={`${dailyCompleted} of ${dailyTodos.length} done`}
-            />
-          </div>
+            <div className="flex flex-col items-center p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800">
+              <ProgressRing
+                percentage={weeklyPct}
+                size={110}
+                strokeWidth={9}
+                gradientId="weeklyGradient"
+                label="Weekly"
+                subtitle={`${weeklyCompleted} of ${weeklyTodos.length}`}
+              />
+            </div>
 
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
-            <ProgressRing
-              percentage={weeklyPct}
-              size={120}
-              strokeWidth={10}
-              label="Weekly"
-              subtitle={`${weeklyCompleted} of ${weeklyTodos.length} done`}
-            />
+            <div className="flex flex-col items-center p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800">
+              <ProgressRing
+                percentage={monthlyPct}
+                size={110}
+                strokeWidth={9}
+                gradientId="monthlyGradient"
+                label="Monthly"
+                subtitle={`${monthlyCompleted} of ${monthlyTodos.length}`}
+              />
+            </div>
           </div>
-
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
-            <ProgressRing
-              percentage={monthlyPct}
-              size={120}
-              strokeWidth={10}
-              label="Monthly"
-              subtitle={`${monthlyCompleted} of ${monthlyTodos.length} done`}
-            />
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Task List Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
             All Tasks ({filteredTodos.length})
           </h2>
         </div>
@@ -212,16 +266,14 @@ export function DashboardPage() {
           onStatusChange={setStatusFilter}
         />
 
-        {/* List & Drag Reorder */}
+        {/* Task List & Loading Skeleton */}
         {loading ? (
-          <div className="p-12 text-center text-xs font-semibold text-gray-500 animate-pulse">
-            Loading tasks...
-          </div>
+          <TaskListSkeleton />
         ) : (
           <TodoList
             todos={filteredTodos}
-            onToggle={toggleTodo}
-            onDelete={deleteTodo}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
             onEdit={handleEditClick}
             onReorder={reorderTodos}
             onAddNew={handleOpenNewModal}
@@ -233,7 +285,7 @@ export function DashboardPage() {
       <TodoFormModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleCreateTask}
+        onSubmit={handleCreateOrUpdateTask}
         initialData={editingTodo}
         defaultCategory="daily"
       />

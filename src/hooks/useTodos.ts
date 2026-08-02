@@ -141,7 +141,7 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
   }, [categoryFilter, isGuest, user])
 
   useEffect(() => {
-    fetchTodos()
+    void fetchTodos()
 
     if (!isGuest && isSupabaseConfigured && user) {
       const subId = Math.random().toString(36).substring(2, 8)

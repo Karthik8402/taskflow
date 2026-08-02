@@ -2,14 +2,16 @@ interface ProgressRingProps {
   percentage: number
   size?: number
   strokeWidth?: number
+  gradientId?: string
   label?: string
   subtitle?: string
 }
 
 export function ProgressRing({
   percentage,
-  size = 140,
-  strokeWidth = 12,
+  size = 130,
+  strokeWidth = 10,
+  gradientId = 'progressGradient',
   label,
   subtitle,
 }: ProgressRingProps) {
@@ -27,7 +29,7 @@ export function ProgressRing({
           r={radius}
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-200 dark:text-gray-800"
+          className="text-slate-200 dark:text-slate-800"
           fill="transparent"
         />
         {/* Progress bar */}
@@ -35,7 +37,7 @@ export function ProgressRing({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="url(#progressGradient)"
+          stroke={`url(#${gradientId})`}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
@@ -44,26 +46,25 @@ export function ProgressRing({
           className="transition-all duration-700 ease-out"
         />
         <defs>
-          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6366F1" />
-            <stop offset="50%" stopColor="#06B6D4" />
-            <stop offset="100%" stopColor="#10B981" />
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2563eb" />
+            <stop offset="100%" stopColor="#059669" />
           </linearGradient>
         </defs>
       </svg>
       {/* Center Label */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           {Math.round(percentage)}%
         </span>
         {label && (
-          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
             {label}
           </span>
         )}
       </div>
       {subtitle && (
-        <span className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">
+        <span className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
           {subtitle}
         </span>
       )}

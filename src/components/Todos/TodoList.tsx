@@ -15,7 +15,7 @@ import {
 } from '@dnd-kit/sortable'
 import type { Todo } from '../../types'
 import { TodoItem } from './TodoItem'
-import { CheckCircle2, ListPlus } from 'lucide-react'
+import { EmptyState } from '../ui/EmptyState'
 
 interface TodoListProps {
   todos: Todo[]
@@ -24,6 +24,7 @@ interface TodoListProps {
   onEdit: (todo: Todo) => void
   onReorder: (reorderedTodos: Todo[]) => void
   onAddNew?: () => void
+  emptyTitle?: string
   emptyMessage?: string
 }
 
@@ -34,7 +35,8 @@ export function TodoList({
   onEdit,
   onReorder,
   onAddNew,
-  emptyMessage = 'No tasks found. Add a new task to get started!',
+  emptyTitle = 'No tasks found',
+  emptyMessage = 'Add a new task to get started!',
 }: TodoListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -59,26 +61,12 @@ export function TodoList({
 
   if (todos.length === 0) {
     return (
-      <div className="glass-card rounded-2xl p-10 text-center space-y-4 border border-dashed border-gray-300 dark:border-gray-800">
-        <div className="w-14 h-14 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto">
-          <CheckCircle2 size={30} className="stroke-[1.75]" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-bold text-gray-900 dark:text-white">All caught up!</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-            {emptyMessage}
-          </p>
-        </div>
-        {onAddNew && (
-          <button
-            onClick={onAddNew}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
-          >
-            <ListPlus size={16} />
-            <span>Create Task</span>
-          </button>
-        )}
-      </div>
+      <EmptyState
+        title={emptyTitle}
+        description={emptyMessage}
+        actionLabel={onAddNew ? 'Create Task' : undefined}
+        onAction={onAddNew}
+      />
     )
   }
 

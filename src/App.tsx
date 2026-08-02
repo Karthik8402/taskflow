@@ -1,26 +1,33 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
-import { ErrorBoundary } from './components/Layout/ErrorBoundary'
-import { Navbar } from './components/Layout/Navbar'
-import { Sidebar } from './components/Layout/Sidebar'
-import { AuthPage } from './pages/AuthPage'
+import { ErrorBoundary } from './components/layout/ErrorBoundary'
+import { AppShell } from './components/layout/AppShell'
+import { Spinner } from './components/ui/Spinner'
+
+import { SignInPage } from './pages/auth/SignInPage'
+import { SignUpPage } from './pages/auth/SignUpPage'
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/auth/ResetPasswordPage'
+
 import { DashboardPage } from './pages/DashboardPage'
-import { DailyPage } from './pages/DailyPage'
-import { WeeklyPage } from './pages/WeeklyPage'
-import { MonthlyPage } from './pages/MonthlyPage'
+import { TaskListPage } from './components/tasks/TaskListPage'
+import { AnalyticsPage } from './pages/AnalyticsPage'
+import { NotificationsPage } from './pages/NotificationsPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { HelpPage } from './pages/HelpPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0B0F17]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#090D16]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
-          <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">
+          <Spinner size="lg" />
+          <span className="text-xs font-semibold text-slate-500 tracking-wider uppercase">
             Loading TaskFlow...
           </span>
         </div>
@@ -29,67 +36,122 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />
+    return <Navigate to="/auth/sign-in" replace />
   }
 
   return <>{children}</>
 }
 
-function MainLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
+function AuthenticatedApp() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B0F17] text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <Navbar onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
-      <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 min-w-0">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/daily"
-              element={
-                <ProtectedRoute>
-                  <DailyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/weekly"
-              element={
-                <ProtectedRoute>
-                  <WeeklyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/monthly"
-              element={
-                <ProtectedRoute>
-                  <MonthlyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
-    </div>
+    <AppShell>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <TaskListPage
+                category="all"
+                title="All Tasks"
+                description="Manage and filter your entire task portfolio across categories."
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/daily"
+          element={
+            <ProtectedRoute>
+              <TaskListPage
+                category="daily"
+                title="Daily Tasks"
+                description="Focus on high-impact actions and daily habit execution."
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/weekly"
+          element={
+            <ProtectedRoute>
+              <TaskListPage
+                category="weekly"
+                title="Weekly Goals"
+                description="Medium-term milestone objectives for the current week."
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/monthly"
+          element={
+            <ProtectedRoute>
+              <TaskListPage
+                category="monthly"
+                title="Monthly Targets"
+                description="Strategic long-term targets for the current month."
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <HelpPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute>
+              <NotFoundPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AppShell>
   )
 }
 
@@ -100,8 +162,15 @@ export default function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/*" element={<MainLayout />} />
+              {/* Auth Routes */}
+              <Route path="/auth" element={<Navigate to="/auth/sign-in" replace />} />
+              <Route path="/auth/sign-in" element={<SignInPage />} />
+              <Route path="/auth/sign-up" element={<SignUpPage />} />
+              <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Main Authenticated Layout Routes */}
+              <Route path="/*" element={<AuthenticatedApp />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>
