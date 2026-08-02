@@ -114,11 +114,8 @@ export function LandingPage() {
               <CheckCircle2 size={20} className="stroke-[2.5]" />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-blue-600 dark:from-white dark:via-slate-200 dark:to-blue-400 bg-clip-text text-transparent">
+              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-blue-600 dark:from-white dark:via-slate-200 dark:to-blue-400 bg-clip-text text-transparent">
                 TaskFlow
-              </span>
-              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest -mt-1">
-                SaaS
               </span>
             </div>
           </RouterLink>
