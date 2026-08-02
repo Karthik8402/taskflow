@@ -1,10 +1,10 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/TaskFlow-v1.0.0-2563eb?style=for-the-badge&logo=checkmarx&logoColor=white" alt="TaskFlow" />
+  <img src="https://img.shields.io/badge/TaskFlow-v2.0-2563eb?style=for-the-badge&logo=checkmarx&logoColor=white" alt="TaskFlow" />
   <br/><br/>
 
-  <h1>TaskFlow</h1>
-  <p><strong>A modern, production-quality task management SaaS application</strong></p>
-  <p>Built with React 19, Vite, TypeScript, Tailwind CSS v4, and Supabase</p>
+  <h1>TaskFlow SaaS 2.0</h1>
+  <p><strong>Next-Gen Productivity Workspace & Intelligent Task Management Application</strong></p>
+  <p>Built with React 19, Vite, TypeScript 5.7, Tailwind CSS v4, and Supabase PostgreSQL</p>
 
   <br/>
 
@@ -19,33 +19,39 @@
 
 ---
 
-## ✨ Features
+## 🔗 Live Links
 
-- **Task Categorization** — Organize tasks into **Daily**, **Weekly**, and **Monthly** cycles
-- **Priority Management** — Three-tier priority system (High / Medium / Low) with clear visual indicators
-- **Drag & Drop Reordering** — Reorder tasks intuitively via `@dnd-kit`
-- **Analytics Dashboard** — Real-time productivity metrics, completion rates, and priority distribution charts
-- **Full Authentication** — Separate sign-in, sign-up, forgot password, and password reset flows via Supabase Auth
-- **Guest / Demo Mode** — Try the full app without creating an account
-- **Dark Mode** — System-aware dark/light theme toggle with persistence
-- **Responsive Design** — Desktop sidebar + mobile bottom navigation bar
-- **Real-time Sync** — Live task synchronization via Supabase Realtime (when connected)
-- **Offline/Demo Fallback** — Works fully in browser local storage when Supabase is not configured
-- **Data Export** — Download a full JSON backup of all task data
-- **Row Level Security** — All data is isolated per user at the PostgreSQL level
+- **Production App**: [https://todo.karthikdev.app](https://todo.karthikdev.app)
+- **GitHub Repository**: [https://github.com/Karthik8402/taskflow](https://github.com/Karthik8402/taskflow)
 
 ---
 
-## 🛡️ Security
+## ✨ Key Features & UX Highlights
 
-- **No hardcoded credentials** — All secrets are loaded from environment variables only
-- **Row Level Security (RLS)** enforced on all Supabase tables
-- **Safe error messages** — Backend errors are mapped to user-friendly messages (no stack traces exposed)
-- **Password validation** — Client-side enforcement of minimum 8 character length
-- **Password visibility toggle** — Accessible show/hide password on auth forms
-- **Delete confirmation** — All destructive actions require explicit modal confirmation
-- **Redirect allowlist** — Internal redirect validation to prevent open redirect attacks
-- **No secrets in `.env.local`** tracked by git — `.env.local` is excluded in `.gitignore`
+- **3-Time-Cycle Focus Windows** — Categorize work into **Daily Actions** ☀️, **Weekly Milestones** 🗓️, and **Monthly Targets** 🎯.
+- **Glassmorphic Public Landing Page** — Showcase hero banner, interactive mock dashboard, features, testimonials, FAQ accordion, and pricing CTAs (`/` and `/landing`).
+- **Interactive Analytics Graphs** — Switch dynamically between:
+  - 📈 **Velocity Area Curve**: Bezier trend chart with hover tooltips and daily completion percentages.
+  - 🍩 **Priority Donut Chart**: High/Medium/Low priority distribution with percentage legends.
+  - 📊 **Category Column Bars**: Comparative completion progress across time windows.
+- **Custom UI Controls** — Built-in custom `DatePicker` calendar and `PrioritySelect` selector with color badges and keyboard shortcuts (`↑`/`↓`/`Esc`).
+- **Theme-Aware Toast Notifications** — Animated notifications with Light and Dark mode styling and colored left accent bars.
+- **Auth Header Navigation** — Dedicated `AuthHeader` bar across Sign In, Sign Up, Forgot Password, and Reset Password pages with brand logo, Theme Toggle, and "← Home" link.
+- **Dynamic Route Titles** — Automatic document title updates (`PageTitleManager` & `useDocumentTitle`) for SEO and tab navigation.
+- **Drag & Drop Reordering** — Smooth task prioritization powered by `@dnd-kit`.
+- **Instant Guest / Demo Mode** — Full task management using browser `localStorage` without requiring sign-up or Supabase credentials.
+- **Bank-Grade Security** — PostgreSQL Row Level Security (RLS) policies guaranteeing strict multi-tenant data isolation.
+- **JSON Data Export** — Instant backup export of all tasks and user settings.
+
+---
+
+## 🛡️ Security & Quality Guarantees
+
+- **No Public Credentials Exposed** — All backend keys loaded exclusively from environment variables (`.env.local`).
+- **Row Level Security (RLS)** — Database rules restrict task queries strictly to `auth.uid() = user_id`.
+- **Input & Auth Sanitization** — Password strength validation and user-friendly error mapping without stack traces.
+- **Modal Popover Positioning** — Relative popup containment preventing UI clipping in modals.
+- **No-Secret Git Protection** — `.env.local` and sensitive files enforced in `.gitignore`.
 
 ---
 
@@ -55,7 +61,7 @@
 
 - [Node.js](https://nodejs.org/) v20+
 - [npm](https://www.npmjs.com/) v10+
-- A [Supabase](https://supabase.com/) project (optional — app runs in Demo Mode without it)
+- A [Supabase](https://supabase.com/) project (optional — app runs in Guest/Demo mode without it)
 
 ### Installation
 
@@ -67,10 +73,10 @@ cd taskflow
 # 2. Install dependencies
 npm install
 
-# 3. Copy the environment example
+# 3. Create your local environment file
 cp .env.example .env.local
 
-# 4. Fill in your Supabase credentials (optional — skip for Demo Mode)
+# 4. Fill in your Supabase credentials (optional for cloud sync)
 # Edit .env.local:
 # VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 # VITE_SUPABASE_ANON_KEY=your-supabase-anon-key-here
@@ -79,56 +85,64 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### Database Setup (Supabase)
+### Database Setup (Supabase SQL Schema)
 
-If connecting to Supabase, apply the schema to your project:
-
+To connect your own Supabase instance:
 1. Open your [Supabase Dashboard](https://app.supabase.com/)
 2. Navigate to **SQL Editor**
-3. Paste and run the contents of [`supabase/schema.sql`](supabase/schema.sql)
-
-This creates the `profiles` and `todos` tables, indexes, RLS policies, and realtime configuration.
+3. Execute the schema script located at [`supabase/schema.sql`](supabase/schema.sql)
 
 ---
 
-## 📖 Usage
+## 📖 Route Map
 
-| Route | Description |
-|---|---|
-| `/` | Productivity Dashboard — all tasks + category rings |
-| `/daily` | Daily Tasks workspace |
-| `/weekly` | Weekly Goals workspace |
-| `/monthly` | Monthly Targets workspace |
-| `/analytics` | Analytics — completion rates, category breakdown, priority stats |
-| `/settings` | Theme preferences, data export, connection status |
-| `/profile` | Account overview |
-| `/notifications` | Notifications hub *(coming soon)* |
-| `/help` | Help & Documentation *(coming soon)* |
-| `/auth/sign-in` | Sign In |
-| `/auth/sign-up` | Create Account |
-| `/auth/forgot-password` | Password Reset Request |
-| `/auth/reset-password` | Set New Password |
+| Path | Page Component | Description |
+|---|---|---|
+| `/` | `LandingPage.tsx` | Glassmorphic Public SaaS Landing Page |
+| `/landing` | `LandingPage.tsx` | Public Landing Page alias |
+| `/dashboard` | `DashboardPage.tsx` | Main SaaS Workspace & Progress Rings |
+| `/tasks` | `TaskListPage.tsx` | Portfolio view of all tasks |
+| `/daily` | `TaskListPage.tsx` | Daily Actions workspace |
+| `/weekly` | `TaskListPage.tsx` | Weekly Goals workspace |
+| `/monthly` | `TaskListPage.tsx` | Monthly Targets workspace |
+| `/analytics` | `AnalyticsPage.tsx` | Interactive Velocity, Donut & Bar Analytics |
+| `/settings` | `SettingsPage.tsx` | Theme, JSON Backup & Connection Status |
+| `/profile` | `ProfilePage.tsx` | Profile Overview & Preferences |
+| `/notifications` | `NotificationsPage.tsx` | Notifications Center |
+| `/help` | `HelpPage.tsx` | Help & FAQ Center |
+| `/auth/sign-in` | `SignInPage.tsx` | User Sign In |
+| `/auth/sign-up` | `SignUpPage.tsx` | Account Registration |
+| `/auth/forgot-password` | `ForgotPasswordPage.tsx` | Password Recovery Request |
+| `/auth/reset-password` | `ResetPasswordPage.tsx` | Set New Password |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Project Structure
 
-```
-src/
-├── components/
-│   ├── layout/          # AppShell, Navbar, Sidebar, MobileBottomNav, DemoBanner
-│   ├── Dashboard/       # ProgressRing, StatsCard
-│   ├── Todos/           # TodoItem, TodoList, TodoFilter, TodoFormModal
-│   ├── tasks/           # Shared TaskListPage (replaces duplicate category pages)
-│   └── ui/              # 18 reusable design system primitives
-├── context/             # AuthContext, ThemeContext, ToastContext
-├── hooks/               # useTodos (task CRUD + realtime)
-├── lib/                 # supabase.ts, validation.ts
-├── pages/               # DashboardPage, AnalyticsPage, SettingsPage, ProfilePage
-│   └── auth/            # SignInPage, SignUpPage, ForgotPasswordPage, ResetPasswordPage
-├── styles/              # tokens.css (design system tokens)
-├── test/                # setup.ts (Vitest + testing-library config)
-└── types/               # database.types.ts, index.ts
+```text
+taskflow/
+├── .github/
+│   ├── workflows/ci.yml         # 3-Stage Parallel CI Pipeline
+│   └── dependabot.yml           # Weekly Dependency Updates
+├── supabase/
+│   └── schema.sql               # PostgreSQL RLS & Table Definitions
+├── src/
+│   ├── components/
+│   │   ├── layout/              # AppShell, AuthHeader, Navbar, Sidebar, MobileBottomNav
+│   │   ├── Dashboard/           # ProgressRing, StatsCard
+│   │   ├── Todos/               # TodoItem, TodoList, TodoFilter, TodoFormModal
+│   │   ├── tasks/               # Shared TaskListPage component
+│   │   └── ui/                  # DatePicker, PrioritySelect, Modal, Button, Card, Toast...
+│   ├── context/                 # AuthContext, ThemeContext, ToastContext
+│   ├── hooks/                   # useTodos, useDocumentTitle
+│   ├── lib/                     # supabase.ts, validation.ts
+│   ├── pages/                   # LandingPage, DashboardPage, AnalyticsPage, SettingsPage...
+│   │   └── auth/                # SignInPage, SignUpPage, ForgotPasswordPage, ResetPasswordPage
+│   ├── test/                    # Setup & Vitest test mocks
+│   └── types/                   # database.types.ts, index.ts
+├── index.html                   # HTML Entry point
+├── vitest.config.ts             # Vitest & happy-dom Configuration
+└── wrangler.json                # Cloudflare SPA Deployment Config
 ```
 
 ---
@@ -139,76 +153,47 @@ src/
 |---|---|
 | **Framework** | React 19 + Vite 6 |
 | **Language** | TypeScript 5.7 |
-| **Styling** | Tailwind CSS v4 + CSS Custom Properties (design tokens) |
+| **Styling** | Tailwind CSS v4 + Design Tokens (`index.css`) |
 | **Routing** | React Router v7 |
-| **Backend / DB** | Supabase (PostgreSQL + RLS + Realtime + Auth) |
-| **Drag & Drop** | @dnd-kit/core + @dnd-kit/sortable |
-| **Icons** | Lucide React |
-| **Dates** | date-fns |
-| **Testing** | Vitest + @testing-library/react + jsdom |
-| **Linting** | ESLint v10 + typescript-eslint + eslint-plugin-react-hooks |
-| **CI/CD** | GitHub Actions (lint → typecheck → test → build → audit) |
-| **Deployment** | Cloudflare Workers (via `wrangler.json`) |
+| **Backend & DB** | Supabase (PostgreSQL + RLS + Realtime + Auth) |
+| **Drag & Drop** | `@dnd-kit/core` + `@dnd-kit/sortable` |
+| **Testing** | Vitest 4 + `@testing-library/react` + `happy-dom` |
+| **Linting** | ESLint v10 + `typescript-eslint` |
+| **CI/CD** | GitHub Actions (Parallel Quality Gates → Build → Security Audit) |
+| **Deployment** | Cloudflare Workers / Pages |
 
 ---
 
-## 🧪 Development Scripts
+## 🧪 Available Scripts
 
 ```bash
 # Start local development server
 npm run dev
 
-# Type check (no emit)
+# TypeScript type checking
 npm run typecheck
 
-# Lint (ESLint flat config)
+# ESLint check
 npm run lint
 
-# Run unit & component tests
+# Run unit tests
 npm run test:run
 
-# Run tests with coverage report
+# Run unit tests with V8 coverage report
 npm run test:coverage
 
-# Production build
+# Build for production
 npm run build
 
-# Preview production build locally
+# Preview production build
 npm run preview
-
-# Generate Supabase TypeScript types (requires SUPABASE_PROJECT_ID env var)
-npm run gen:types
 ```
-
----
-
-## 🔄 CI/CD Pipeline
-
-GitHub Actions runs on every push and pull request to `main`:
-
-1. **Quality** — lint + typecheck + test coverage
-2. **Build** — production bundle verification
-3. **Security** — `npm audit --audit-level=high`
-
-**Dependabot** is configured for weekly npm dependency updates (dev dependencies grouped).
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit with a clear message: `git commit -m "feat: add your feature"`
-4. Push to your branch: `git push origin feature/your-feature`
-5. Open a Pull Request against `main`
-
-Please ensure all CI checks pass before requesting a review.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+Licensed under the [MIT License](LICENSE).
 
 ---
 
