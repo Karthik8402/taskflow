@@ -54,6 +54,18 @@ export function validatePassword(password: string): { valid: boolean; message?: 
       message: `Password must be at least ${TASK_CONSTRAINTS.PASSWORD_MIN_LENGTH} characters long.`,
     }
   }
+
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasNumber = /[0-9]/.test(password)
+  const hasSpecial = /[^a-zA-Z0-9]/.test(password)
+
+  if (!hasUppercase || !hasNumber || !hasSpecial) {
+    return {
+      valid: false,
+      message: 'Password must contain at least 1 uppercase letter, 1 number, and 1 special character.',
+    }
+  }
+
   return { valid: true }
 }
 

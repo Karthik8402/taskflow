@@ -73,6 +73,10 @@ const SAMPLE_TODOS: Todo[] = [
   },
 ]
 
+// Typed helper for Supabase todos table
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const todosTable = () => (supabase as any).from('todos')
+
 export function useTodos(categoryFilter?: TodoCategory | 'all') {
   const { user, isGuest } = useAuth()
   const [todos, setTodos] = useState<Todo[]>([])
@@ -114,8 +118,7 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
     }
 
     try {
-      let query = (supabase as any)
-        .from('todos')
+      let query = todosTable()
         .select('*')
         .eq('user_id', user.id)
         .order('sort_order', { ascending: true })
@@ -128,7 +131,7 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
       const { data, error } = await query
 
       if (error) throw error
-      setTodos(data || [])
+      setTodos((data as Todo[]) || [])
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error fetching tasks'
       console.error('Supabase fetch error:', message)
@@ -197,8 +200,7 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
       return newTodo
     }
 
-    const { data, error } = await (supabase as any)
-      .from('todos')
+    const { data, error } = await todosTable()
       .insert({
         ...todoData,
         user_id: user.id,
@@ -208,7 +210,7 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
 
     if (error) throw error
     fetchTodos()
-    return data
+    return data as Todo
   }
 
   const toggleTodo = async (id: string, completed: boolean) => {
@@ -220,10 +222,10 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
       return
     }
 
-    const { error } = await (supabase as any)
-      .from('todos')
+    const { error } = await todosTable()
       .update({ completed })
       .eq('id', id)
+      .eq('user_id', user.id)
 
     if (error) throw error
     fetchTodos()
@@ -238,10 +240,10 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
       return
     }
 
-    const { error } = await (supabase as any)
-      .from('todos')
+    const { error } = await todosTable()
       .update(updates)
       .eq('id', id)
+      .eq('user_id', user.id)
 
     if (error) throw error
     fetchTodos()
@@ -254,10 +256,10 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
       return
     }
 
-    const { error } = await (supabase as any)
-      .from('todos')
+    const { error } = await todosTable()
       .delete()
       .eq('id', id)
+      .eq('user_id', user.id)
 
     if (error) throw error
     fetchTodos()
@@ -276,19 +278,23 @@ export function useTodos(categoryFilter?: TodoCategory | 'all') {
     }
 
     try {
-      const updates = reorderedList.map((item, index) => ({
+      const upsertItems = reorderedList.map((item, index) => ({
         id: item.id,
+        user_id: user.id,
+        title: item.title,
+        description: item.description,
+        category: item.category,
+        priority: item.priority,
+        completed: item.completed,
+        due_date: item.due_date,
         sort_order: index + 1,
+        updated_at: new Date().toISOString(),
       }))
 
-      for (const update of updates) {
-        await (supabase as any)
-          .from('todos')
-          .update({ sort_order: update.sort_order })
-          .eq('id', update.id)
-      }
+      const { error } = await todosTable().upsert(upsertItems)
+      if (error) throw error
     } catch (err) {
-      console.error('Failed to update sort order:', err)
+      console.error('Failed to batch update sort order:', err)
       fetchTodos()
     }
   }

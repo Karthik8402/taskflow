@@ -47,10 +47,11 @@ describe('validateTaskInput', () => {
 })
 
 describe('validatePassword', () => {
-  it('CMP-02: requires minimum 8 characters', () => {
+  it('CMP-02: requires minimum 8 characters and complexity', () => {
     expect(validatePassword('short').valid).toBe(false)
-    expect(validatePassword('1234567').valid).toBe(false)
-    expect(validatePassword('12345678').valid).toBe(true)
+    expect(validatePassword('12345678').valid).toBe(false) // Missing uppercase & special char
+    expect(validatePassword('Password123').valid).toBe(false) // Missing special char
+    expect(validatePassword('P@ssword123').valid).toBe(true) // Valid: >=8 chars, 1 uppercase, 1 number, 1 special char
   })
 })
 

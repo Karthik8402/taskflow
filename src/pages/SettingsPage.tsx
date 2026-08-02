@@ -14,7 +14,20 @@ export function SettingsPage() {
   const [exported, setExported] = useState(false)
 
   const handleExportData = () => {
-    const jsonStr = JSON.stringify(todos, null, 2)
+    // Sanitize exported JSON data by stripping internal user_id UUIDs
+    const sanitizedTodos = todos.map(t => ({
+      id: t.id,
+      title: t.title,
+      description: t.description || '',
+      category: t.category,
+      priority: t.priority,
+      completed: t.completed,
+      due_date: t.due_date,
+      sort_order: t.sort_order,
+      created_at: t.created_at,
+    }))
+
+    const jsonStr = JSON.stringify(sanitizedTodos, null, 2)
     const blob = new Blob([jsonStr], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

@@ -17,15 +17,37 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 const GUEST_USER_KEY = 'taskflow_guest_active'
+const GUEST_USER_TIME = 'taskflow_guest_active_time'
+const LOCAL_STORAGE_TODOS_KEY = 'taskflow_local_todos'
+const GUEST_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 Days TTL
+
+function isGuestSessionValid(): boolean {
+  const active = localStorage.getItem(GUEST_USER_KEY) === 'true'
+  if (!active) return false
+
+  const timestamp = localStorage.getItem(GUEST_USER_TIME)
+  if (!timestamp) return false
+
+  const now = Date.now()
+  const created = parseInt(timestamp, 10)
+  if (isNaN(created) || now - created > GUEST_TTL_MS) {
+    // Session expired — clear guest storage
+    localStorage.removeItem(GUEST_USER_KEY)
+    localStorage.removeItem(GUEST_USER_TIME)
+    localStorage.removeItem(LOCAL_STORAGE_TODOS_KEY)
+    return false
+  }
+
+  return true
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [isGuest, setIsGuest] = useState<boolean>(() => {
-    // If Supabase is not configured, default to Guest Mode
     if (!isSupabaseConfigured) return true
-    return localStorage.getItem(GUEST_USER_KEY) === 'true'
+    return isGuestSessionValid()
   })
 
   useEffect(() => {
@@ -104,11 +126,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null)
     setIsGuest(false)
     localStorage.removeItem(GUEST_USER_KEY)
+    localStorage.removeItem(GUEST_USER_TIME)
   }
 
   const enableGuestMode = () => {
     setIsGuest(true)
     localStorage.setItem(GUEST_USER_KEY, 'true')
+    localStorage.setItem(GUEST_USER_TIME, Date.now().toString())
     setUser({
       id: 'guest-demo-user-id',
       email: 'guest@taskflow.demo',
