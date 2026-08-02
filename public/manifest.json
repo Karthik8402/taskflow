@@ -3,10 +3,22 @@
   "name": "TaskFlow — 24/7 To-Do & Task Manager",
   "icons": [
     {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/favicon.svg",
       "type": "image/svg+xml",
-      "sizes": "512x512 192x192 64x64 32x32 24x24 16x16",
-      "purpose": "any maskable"
+      "sizes": "any",
+      "purpose": "any"
     }
   ],
   "start_url": "/",
